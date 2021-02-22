@@ -47,11 +47,11 @@ clean:
 	rm *.o
 
 clean-all:
-	rm *.o $(TARGET).*
+	rm -f *.o $(TARGET).*
 
 .PHONY: program
 program: $(TARGET).hex
-	avrdude -c avr109 -p m169 -P /dev/ttyUSB0  -b 9600 -U flash:w:$(TARGET).hex
+	avrdude -C avrdude.conf -c avr109 -p m169 -P /dev/ttyUSB0  -b 9600 -U flash:w:$(TARGET).hex
 
 
 
