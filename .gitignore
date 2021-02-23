@@ -1,2 +1,5 @@
-*.o
-butterfly.*
+*/*.o
+*/*.d
+*/*.hex
+*/*.elf
+*/*.map

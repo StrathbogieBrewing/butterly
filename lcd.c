@@ -101,7 +101,9 @@ const           uint16_t LCD_SegTable[] PROGMEM =
 void LCD_Init(void)
 {
 	// Set the initial contrast level to maximum:
-	LCD_CONTRAST_LEVEL(0x0F);
+	LCD_CONTRAST_LEVEL(0x08);
+
+    ASSR |= (1 << AS2);    // enable asynchronous clock
 
     // Select asynchronous clock source, enable all COM pins and enable all segment pins:
     LCDCRB  = (1<<LCDCS) | (3<<LCDMUX0) | (7<<LCDPM0);
@@ -111,6 +113,8 @@ void LCD_Init(void)
 
 	// Enable LCD and set low power waveform, enable start of frame interrupt:
     LCDCRA  = (1<<LCDEN) | (1<<LCDAB) | (1<<LCDIE);
+
+    sei();
 }
 
 /*
