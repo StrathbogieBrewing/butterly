@@ -55,27 +55,26 @@ calibrate:
 	andi	TEMPL, 0x07
 	brne	calibrate
 
-	; average latency of start loop is ((3 + 7) / 2) = 4.5 cpu cycles
+	; loop is 6 cpu cycles
 calibrateWaitStart:
 	lds		TEMPL, _SFR_MEM_ADDR(TCNT2) ; 2 cycle
-	andi	TEMPH, 0x07                ; 1 cycle
-	breq	calibrateWaitStart         ; 1 cycle if no branch, 2 cycles if branch
+	andi	TEMPH, 0x07                 ; 1 cycle
+	nop                               ; 1 cycle
+	breq	calibrateWaitStart          ; 1 cycle if no branch, 2 cycles if branch
 
 	; calibrateTimerLoop is executed for 31 periods of 32.768 kHz clock or 946 us
-  ; plus average latency of (4.5 + 2.5) = 7 cpu cycles at 1 us / cycle
-  ; total 946 + 7 = 951 us or 951 cpu cycles
-  ; 951 / 5 cycles in loop = 190 counts
+  ; 946 us = 946  cpu cycles @ 1 MHz
+  ; 946 / 6 cycles in loop = 158 counts
 
-  ; average latency of stop loop is ((0 + 5) / 2) = 2.5 cpu cycles
+	; loop is 6 cpu cycles
 calibrateTimerLoop:
-	lds		TEMPL, _SFR_MEM_ADDR(TCNT2) ; 2 cycle
+	lds		TEMPH, _SFR_MEM_ADDR(TCNT2) ; 2 cycle
 	inc		TEMPL                      ; 1 cycle
 	andi	TEMPH, 0x20                ; 1 cycle
 	breq	calibrateTimerLoop         ; 1 cycle if no branch, 2 cycles if branch
 
 	ldi		TEMPH, 0
 
-	; aim for target of between 189 and 191 counts
   ; average error is zero and allows for OSCCAL step size
 calibrateSlow:
 	cpi		TEMPL, 157
@@ -88,9 +87,9 @@ calibrateFast:
 	ldi		TEMPH, -1
 
 calibrateDone:
-	lds      TEMPL, _SFR_MEM_ADDR(OSCCAL)
+	lds   TEMPL, _SFR_MEM_ADDR(OSCCAL)
 	add		TEMPL, TEMPH
-	sts     _SFR_MEM_ADDR(OSCCAL), TEMPL
+	sts   _SFR_MEM_ADDR(OSCCAL), TEMPL
 	ret
 
 ; *** application boot entry point ***
@@ -114,7 +113,7 @@ startBootloader:
 	ldi		TEMPH, (1 << CS20)
   sts		_SFR_MEM_ADDR(TCCR2A), TEMPH
 
-	rjmp	inituart
+	; rjmp	inituart
 
 calibrationLoop:
 	rcall	calibrate
